@@ -4,38 +4,56 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
-
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnTouchListener;
-
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class DrawingActivity extends AppCompatActivity implements OnTouchListener {
+public class NavActivity extends AppCompatActivity {
 
-    DrawActivity drawActivity;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.registerReceiver(this.receiver, new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION));
+        manager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        drawActivity = new NavDrawActivity(this);
+        setContentView(drawActivity);
+
+    }
+
+    private NavDrawActivity drawActivity;
     private WifiManager manager;
     private List<ScanResult> scanResultList;
-    public ArrayList<Points> pointList;
-    private Points p = null;
 
 
+    public void searchPoint(List<ScanResult> list) {
+        boolean flag = false;
+        for (Points p : DrawActivity.getPoints()) {
+            if(p.Compare(list)){
+                    drawActivity.drawCircle(p.getX(),p.getY());
+                    flag = true;
+                break;
+            }
+        }
+        if(!flag){
+            drawActivity.clearMap();
+        }
+    }
 
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
+
             if (manager.getScanResults() != null) {
                 scanResultList = manager.getScanResults();
+                searchPoint(scanResultList);
             }
         }
     };
@@ -46,7 +64,7 @@ public class DrawingActivity extends AppCompatActivity implements OnTouchListene
                     WifiManager.WIFI_STATE_UNKNOWN);
             switch (wifiState) {
                 case WifiManager.WIFI_STATE_ENABLING:
-                   // text.setText("Wi-Fi state enabling");
+                    // text.setText("Wi-Fi state enabling");
                     break;
                 case WifiManager.WIFI_STATE_ENABLED:
                     //text.setText("Wi-Fi state enabled");
@@ -56,7 +74,7 @@ public class DrawingActivity extends AppCompatActivity implements OnTouchListene
                     //text.setText("Wi-Fi state disabling");
                     break;
                 case WifiManager.WIFI_STATE_DISABLED:
-                   // text.setText("Wi-Fi state disabled");
+                    // text.setText("Wi-Fi state disabled");
                     break;
                 case WifiManager.WIFI_STATE_UNKNOWN:
                     //text.setText("Wi-Fi state unknown");
@@ -84,45 +102,8 @@ public class DrawingActivity extends AppCompatActivity implements OnTouchListene
     }
 
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        drawActivity = new DrawActivity(this);
-        setContentView(drawActivity);
-        drawActivity.setOnTouchListener(this);
-        this.registerReceiver(this.receiver, new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION));
-        manager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-        manager.setWifiEnabled(true);
-    }
-
-    public void openActivity(View v) {
-        Intent intent = new Intent(DrawingActivity.this, CreatePoint.class);
-        intent.putExtra("point",p);
-        startActivityForResult(intent, 0);
-    }
 
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            p.setPointName(data.getStringExtra("name"));
-            DrawActivity.getPoints().add(p);
-            drawActivity.drawCircle(p.getX(), p.getY());
-        }
-    }
-
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        float x = event.getX();
-        float y = event.getY();
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            p = new Points("name",manager.getScanResults(),(int)x,(int)y);
-            openActivity(v);
-        }
-        return true;
-
-    }
 
 
 }

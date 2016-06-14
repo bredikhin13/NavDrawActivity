@@ -55,7 +55,10 @@ public class web_view extends AppCompatActivity /*implements OnTouchListener*/ {
                     if (isLongPressDetected()) {
                         float x = e.getX();
                         float y = e.getY();
-                        Log.d("aaa",x+"/"+y);
+                        int sx = webView.getScrollX();
+                        int sy = webView.getScrollY();
+                        Log.d("position",x+"/"+y);
+                        Log.d("scroll",sx+"/"+sy);
                     }
                 }
             }).start();

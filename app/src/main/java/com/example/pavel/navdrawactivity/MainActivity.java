@@ -1,6 +1,7 @@
 package com.example.pavel.navdrawactivity;
 
 import android.content.Intent;
+import android.net.wifi.ScanResult;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
@@ -99,6 +100,9 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_web){
             Intent intent = new Intent(MainActivity.this, web_view.class);
             startActivity(intent);
+        } else if (id == R.id.nav_navigate){
+            Intent intent = new Intent(MainActivity.this, NavActivity.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -125,9 +129,16 @@ public class MainActivity extends AppCompatActivity
                 serializer.startTag("", "data");
                 for (Points points : DrawActivity.getPoints()) {
                     serializer.startTag("", "point");
-                    serializer.attribute("", "name", String.valueOf(points.getName()));
+                    serializer.attribute("", "name", String.valueOf(points.getPointName()));
                     serializer.attribute("", "x", String.valueOf(points.getX()));
                     serializer.attribute("", "y", String.valueOf(points.getY()));
+                    for(ScanResult result:points.getScanResults()){
+                        serializer.startTag("","router");
+                        serializer.attribute("","ssid",result.SSID);
+                        serializer.attribute("","bssid",result.BSSID);
+                        serializer.attribute("","level",String.valueOf(result.level));
+                        serializer.endTag("","router");
+                    }
                     serializer.endTag("", "point");
                 }
                 serializer.endTag("", "data");
@@ -149,6 +160,7 @@ public class MainActivity extends AppCompatActivity
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             String path = Environment.getExternalStorageDirectory().getPath() + foldername + "/" + filename;
             File file = new File(path);
+            Points p = null;
             try {
                 FileInputStream stream = new FileInputStream(file);
                 //BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
@@ -162,10 +174,21 @@ public class MainActivity extends AppCompatActivity
                             break;
                         case XmlPullParser.START_TAG:
                             if (parser.getName().equals("point")) {
-                                DrawActivity.getPoints().add(new Points(Float.valueOf(parser.getAttributeValue("", "x")), Float.valueOf(parser.getAttributeValue("", "y"))));
+                                p = new Points(parser.getAttributeValue("","name"),Integer.valueOf(parser.getAttributeValue("", "x")), Integer.valueOf(parser.getAttributeValue("", "y")));
+                            } else if(parser.getName().equals("router")){
+                                ScanResult scanResult = ScanResult.class.newInstance();
+                                scanResult.SSID =parser.getAttributeValue("","ssid");
+                                scanResult.BSSID =parser.getAttributeValue("","bssid");
+                                scanResult.level =Integer.valueOf(parser.getAttributeValue("","level"));
+                                if(p!=null) {
+                                    p.getScanResults().add(scanResult);
+                                }
                             }
                             break;
                         case XmlPullParser.END_TAG:
+                            if (parser.getName().equals("point")) {
+                                DrawActivity.getPoints().add(p);
+                            }
                             break;
                         case XmlPullParser.TEXT:
                             break;
