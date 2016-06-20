@@ -28,6 +28,7 @@ public class DrawingActivity extends AppCompatActivity implements OnTouchListene
     private List<ScanResult> scanResultList;
     public ArrayList<Points> pointList;
     private Points p = null;
+    public static int time = 1000;
 
 
 
@@ -71,7 +72,7 @@ public class DrawingActivity extends AppCompatActivity implements OnTouchListene
             public void run() {
                 while (true) {
                     try {
-                        Thread.sleep(1000);
+                        Thread.sleep(time);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -107,6 +108,7 @@ public class DrawingActivity extends AppCompatActivity implements OnTouchListene
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             p.setPointName(data.getStringExtra("name"));
+            p.SetCount();
             DrawActivity.getPoints().add(p);
             drawActivity.drawCircle(p.getX(), p.getY());
         }

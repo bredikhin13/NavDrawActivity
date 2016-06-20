@@ -103,6 +103,9 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_navigate){
             Intent intent = new Intent(MainActivity.this, NavActivity.class);
             startActivity(intent);
+        } else if (id == R.id.nav_settings){
+            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -187,6 +190,7 @@ public class MainActivity extends AppCompatActivity
                             break;
                         case XmlPullParser.END_TAG:
                             if (parser.getName().equals("point")) {
+                                p.SetCount();
                                 DrawActivity.getPoints().add(p);
                             }
                             break;

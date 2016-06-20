@@ -34,7 +34,8 @@
         <activity android:name=".DrawingActivity" />
         <activity android:name=".web_view" />
         <activity android:name=".CreatePoint" />
-        <activity android:name=".NavActivity"></activity>
+        <activity android:name=".NavActivity" />
+        <activity android:name=".SettingsActivity"></activity>
     </application>
 
 </manifest>

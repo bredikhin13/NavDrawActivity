@@ -37,7 +37,10 @@
         android:id="@+id/textViewPoints"
         android:layout_centerHorizontal="true"
         android:layout_above="@+id/buttonOk"
-        android:layout_below="@+id/editName" />
+        android:layout_below="@+id/editName"
+        android:maxLines="1000"
+        android:scrollbars="vertical"
+        android:scrollIndicators="right" />
 
     <EditText
         android:layout_width="match_parent"

@@ -64,20 +64,15 @@ public class NavActivity extends AppCompatActivity {
                     WifiManager.WIFI_STATE_UNKNOWN);
             switch (wifiState) {
                 case WifiManager.WIFI_STATE_ENABLING:
-                    // text.setText("Wi-Fi state enabling");
                     break;
                 case WifiManager.WIFI_STATE_ENABLED:
-                    //text.setText("Wi-Fi state enabled");
                     startMonitoringRssi();
                     break;
                 case WifiManager.WIFI_STATE_DISABLING:
-                    //text.setText("Wi-Fi state disabling");
                     break;
                 case WifiManager.WIFI_STATE_DISABLED:
-                    // text.setText("Wi-Fi state disabled");
                     break;
                 case WifiManager.WIFI_STATE_UNKNOWN:
-                    //text.setText("Wi-Fi state unknown");
                     break;
             }
         }
@@ -89,7 +84,7 @@ public class NavActivity extends AppCompatActivity {
             public void run() {
                 while (true) {
                     try {
-                        Thread.sleep(1000);
+                        Thread.sleep(DrawingActivity.time);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

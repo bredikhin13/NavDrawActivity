@@ -51,6 +51,7 @@ public class Points implements Parcelable {
     private int count;
     private int x;
     private int y;
+    public static int range = 10;
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
@@ -58,6 +59,7 @@ public class Points implements Parcelable {
         parcel.writeList(scanResults);
         parcel.writeInt(x);
         parcel.writeInt(y);
+        parcel.writeInt(count);
     }
 
     @Override
@@ -70,6 +72,7 @@ public class Points implements Parcelable {
         scanResults = parcel.readArrayList(ClassLoader.getSystemClassLoader());
         x = parcel.readInt();
         y = parcel.readInt();
+        count = parcel.readInt();
     }
 
     public Points(String s, List<ScanResult> list, int x, int y) {
@@ -84,8 +87,7 @@ public class Points implements Parcelable {
                 else return 1;
             }
         });
-
-        this.count = list.size();
+        SetCount();
     }
 
     public Points(String s, int x, int y) {
@@ -97,24 +99,16 @@ public class Points implements Parcelable {
 
 
     public void SetCount(){
-        count = scanResults.size();
+        this.count=0;
+        for(ScanResult scanResult:scanResults){
+            if (scanResult.level>=-80){
+                this.count++;
+            }
+        }
     }
 
     private boolean compareLevel(int pointLevel, int scanLevel) {
-        return (scanLevel > pointLevel - 10 && scanLevel < pointLevel + 10);
-    }
-
-    private void addnewhotspot(List<ScanResult> list) {
-        for (ScanResult s : list) {
-            boolean flag = true;
-            for (ScanResult l : scanResults) {
-                if (s.BSSID.equals(l.BSSID)) flag = false;
-            }
-            if (flag) {
-                scanResults.add(s);
-                flag = true;
-            }
-        }
+        return (scanLevel > pointLevel - range && scanLevel < pointLevel + range);
     }
 
     @Override
@@ -124,15 +118,15 @@ public class Points implements Parcelable {
 
     public boolean Compare(List<ScanResult> list) {
         int res = 0;
-        for (ScanResult s : list) {
-            for (ScanResult l : scanResults) {
-                if (l.BSSID.equals(s.BSSID) && compareLevel(l.level, s.level)) {
+        for (ScanResult l : list) {
+            for (ScanResult s : scanResults) {
+                if (l.BSSID.equals(s.BSSID) && compareLevel(l.level, s.level) && s.level>=-80) {
                     res++;
                     break;
                 }
             }
         }
-        if (res >= count)
+        if (res >= count-count/5)
             return true;
         else
             return false;
